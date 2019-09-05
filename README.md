@@ -38,7 +38,7 @@ Motivation: I wanted to make some generative videos in portrait orientation:
 and have matching outcome on the screen (preview) and in the mp4 file.
 
 [Check this Vimeo Showcase](https://vimeo.com/showcase/6193753) for other videos
-generated for the [Design In Motion](https://demofestival.com)
+generated for the [Design In Motion Festival](https://demofestival.com)
  
 Therefore I introduced double measuring of time,
 which is either based on real time or on frame and frame rate. This led to
