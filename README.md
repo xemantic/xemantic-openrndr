@@ -94,6 +94,8 @@ means you can configure the logging and also redirect it to a file.
 
 ### video
 
+Video recorder of `ColorBuffer` content.
+
 ```kotlin
     extend(ColorBufferRecorder(
         sceneBuffer,
@@ -105,6 +107,8 @@ means you can configure the logging and also redirect it to a file.
 It will be recorded under the file name which contains your `main()` method,
 in the local `video` folder. The video file name will also contain
 extra information about format, preset and recording time. 
+
+E.g.: `FooBar-FULL_HD_PORTRAIT-HIGH_QUALITY-2019-09-05-09.25.52.mp4`
 
 You can have more than one `ColorBufferRecorder` for different purposes.
 For example it was useful for me to also dump raw Kinect input while recording
