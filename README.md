@@ -1,9 +1,24 @@
 # xemantic-openrndr
 
-[OPENRNDR](https://openrndr.org) extensions which are too specific for my workflow to be
-contributed back to the project. It's also a sandbox for ideas which still need
-some time to evolve before they are ready, but might be already useful for someone
-else.
+![](docs/noosphere.gif)
+
+"Creative coding is approaching computing as a mechanical machine instead
+of a mathematical formality."
+
+It's a quote from the authors of [OPENRNDR](https://openrndr.org),
+my favorite creative coding framework. In my daily work I produce 
+OPENRNDR extensions which are too specific for my workflow to be
+contributed back to the project. This is how `xemantic-openrndr` was
+born. It's also a sandbox for
+ideas which still need some time to evolve before they are ready,
+but might be already useful for someone else.
+
+I started this project when I wanted to make some generative videos
+in portrait orientation, with different proportions than
+my screen. And also different timing and frame rates.
+
+[Check this Vimeo Showcase](https://vimeo.com/showcase/6193753) for other videos
+generated for the [Design In Motion Festival](https://demofestival.com)
 
 ## using the project
 
@@ -31,18 +46,10 @@ Pick modules you need.
 
 ### core
 
-Motivation: I wanted to make some generative videos in portrait orientation:
-
-![](docs/noosphere.gif)
-
-and have matching outcome on the screen (preview) and in the mp4 file.
-
-[Check this Vimeo Showcase](https://vimeo.com/showcase/6193753) for other videos
-generated for the [Design In Motion Festival](https://demofestival.com)
- 
-Therefore I introduced double measuring of time,
-which is either based on real time or on frame and frame rate. This led to
-a bit of standardization of my shader code having 2 common uniforms:
+Depending if output is real time, or generated to the video file, 
+there is different time measture - either based on real clock or
+on the current frame and frame rate. This led to a bit of
+standardization of my shader code now having 2 common uniforms:
 
 * `vec2 resolution`
 * `float time` (in seconds)
