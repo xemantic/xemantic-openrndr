@@ -31,8 +31,16 @@ Pick modules you need.
 
 ### core
 
-Motivation: I wanted to make some generative videos and have matching outcome
-on the screen and in the mp4 file. Therefore I introduced double measuring of time,
+Motivation: I wanted to make some generative videos in portrait orientation:
+
+![](docs/noosphere.gif)
+
+and have matching outcome on the screen (preview) and in the mp4 file.
+
+[Check this Vimeo Showcase](https://vimeo.com/showcase/6193753) for other videos
+generated for the [Design In Motion](https://demofestival.com)
+ 
+Therefore I introduced double measuring of time,
 which is either based on real time or on frame and frame rate. This led to
 a bit of standardization of my shader code having 2 common uniforms:
 
