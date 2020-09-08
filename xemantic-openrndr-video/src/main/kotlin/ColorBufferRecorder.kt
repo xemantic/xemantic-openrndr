@@ -1,5 +1,27 @@
+/*
+ * xemantic-openrndr - a playground for OPENRNDR extensions
+ * Copyright (C) 2020  Kazimierz Pogoda
+ *
+ * This file is part of xemantic-openrndr.
+ *
+ * xemantic-openrndr  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * xemantic-openrndr is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with xemantic-openrndr. 
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.xemantic.openrndr.video
 
+import com.xemantic.openrndr.core.FragmentShader
 import org.openrndr.Extension
 import org.openrndr.Program
 import org.openrndr.draw.*
@@ -17,12 +39,11 @@ import java.lang.IllegalStateException
  * of the whole screen. The buffer might have different dimensions than the screen.
  *
  * @see org.openrndr.ffmpeg.ScreenRecorder
- * @param buffer the buffer to take video frames from.
  * @param suffix might be useful for simultaneous recording of many buffers
  *                of the same program.
  */
 class ColorBufferRecorder(
-    val buffer: ColorBuffer,
+    val fragmentShader: FragmentShader,
     override var enabled: Boolean = true,
     val preset: Preset = Preset.HIGH_QUALITY,
     val suffix: String? = null,
@@ -32,7 +53,8 @@ class ColorBufferRecorder(
       Preset.DEMO_FESTIVAL -> newHighQualityVideoWriterProfile(frameRate = 25.0)
       Preset.INSTAGRAM -> newInstagramVideoWriterProfile()
     },
-    val inputFrameRate: Int = 60
+    val inputFrameRate: Int = 60,
+    val output: String = ""
 ) : Extension {
 
   enum class Preset {
@@ -58,37 +80,41 @@ class ColorBufferRecorder(
     )
     context.realTime = (preset == Preset.REAL_TIME)
 
-    videoTarget = renderTarget(buffer.width , buffer.height) {
+    videoTarget = renderTarget(fragmentShader.colorBuffer.width , fragmentShader.colorBuffer.height) {
       colorBuffer()
     }
 
-    fun Int.z(zeroes: Int = 2): String {
-      val sv = this.toString()
-      var prefix = ""
-      for (i in 0 until Math.max(zeroes - sv.length, 0)) {
-        prefix += "0"
+    val outputName = if (output.isBlank()) {
+      fun Int.z(zeroes: Int = 2): String {
+        val sv = this.toString()
+        var prefix = ""
+        for (i in 0 until Math.max(zeroes - sv.length, 0)) {
+          prefix += "0"
+        }
+        return "$prefix$sv"
       }
-      return "$prefix$sv"
-    }
 
-    val dt = LocalDateTime.now()
-    val basename = context.mainClass.simpleName.removeSuffix("Kt")
-    val ext = if (suffix != null) "-$suffix" else ""
-    val spec = "${context.format.name}-${preset.name}"
-    val filename = "video/$basename$ext-$spec-${dt.year.z(4)}-${dt.month.value.z()}-${dt.dayOfMonth.z()}-${dt.hour.z()}.${dt.minute.z()}.${dt.second.z()}.mp4"
+      val dirname = File(".").canonicalFile.name
+      val dt = LocalDateTime.now()
+      val basename = context.mainClass.simpleName.removeSuffix("Kt")
+      val ext = if (suffix != null) "-$suffix" else ""
+      val spec = "${context.format.name}-${preset.name}"
+      val filename = "../../Videos/$dirname/$basename$ext-$spec-${dt.year.z(4)}-${dt.month.value.z()}-${dt.dayOfMonth.z()}-${dt.hour.z()}.${dt.minute.z()}.${dt.second.z()}.mp4"
 
-    File(filename).parentFile.let {
-      if (!it.exists()) {
-        it.mkdirs()
+      File(filename).parentFile.let {
+        if (!it.exists()) {
+          it.mkdirs()
+        }
       }
-    }
+      filename
+    } else { output }
 
-    logger.info { "Recording: $filename" }
+    logger.info { "Recording output: $outputName" }
 
     videoWriter = VideoWriter()
         .profile(profile)
-        .output(filename)
-        .size(buffer.width, buffer.height)
+        .output(outputName)
+        .size(fragmentShader.colorBuffer.width, fragmentShader.colorBuffer.height)
         .frameRate(inputFrameRate)
         .start()
   }
@@ -96,7 +122,7 @@ class ColorBufferRecorder(
   override fun afterDraw(drawer: Drawer, program: Program) {
     drawer.isolatedWithTarget(videoTarget) {
         ortho(videoTarget)
-        image(buffer)
+        image(fragmentShader.colorBuffer)
     }
     videoWriter.frame(videoTarget.colorBuffer(0))
     frame++
